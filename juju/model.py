@@ -24,6 +24,7 @@ from typing import TYPE_CHECKING, Any, Literal, Mapping, overload
 
 import websockets
 import yaml
+from typing_extensions import deprecated
 
 from . import provisioner, tag, utils
 from .annotationhelper import _get_annotations, _set_annotations
@@ -802,13 +803,14 @@ class Model:
         """
         return await self.connect()
 
+    @deprecated("Model.connect_to() is deprecated and will be removed soon")
     async def connect_to(self, connection):
         conn_params = connection.connect_params()
         await self._connect_direct(**conn_params)
 
     async def _connect_direct(self, **kwargs):
-        if self.info:
-            uuid = self.info.uuid
+        if self._info:
+            uuid = self._info.uuid
         elif "uuid" in kwargs:
             uuid = kwargs["uuid"]
         else:
@@ -1228,6 +1230,9 @@ class Model:
 
         If Model.get_info() has not been called, this will return None.
         """
+        if not self.is_connected():
+            raise JujuModelError("Model is not connected")
+
         assert self._info is not None
         return self._info
 
