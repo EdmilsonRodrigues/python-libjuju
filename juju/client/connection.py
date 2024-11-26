@@ -18,7 +18,6 @@ import macaroonbakery.httpbakery as httpbakery
 import websockets
 from dateutil.parser import parse
 from typing_extensions import Self, TypeAlias, overload
-from websockets.protocol import State
 
 from juju import errors, tag, utils
 from juju.client import client
@@ -94,7 +93,7 @@ class Monitor:
                 and connection._receiver_task.cancelled()
             )
 
-        if stopped or connection._ws.state is not State.OPEN:
+        if stopped or connection._ws.state is not websockets.protocol.State.OPEN:
             return self.ERROR
 
         # everything is fine!
