@@ -1,99 +1,18 @@
-# Copyright 2023 Canonical Ltd.
-# Licensed under the Apache V2, see LICENCE file for details.
-
-# A compatibility layer on asyncio that ensures we have all the right
-# bindings for the functions we need from asyncio. Reason for this
-# layer is the frequent functional changes, additions and deprecations
-# in asyncio across the different Python versions.
-
-# Any module that needs to use the asyncio should get the binding from
-# this layer.
-
 import asyncio
 import functools
 import logging
 import signal
-import warnings
-from asyncio import (
-    ALL_COMPLETED as ALL_COMPLETED,
-)
-from asyncio import (
-    FIRST_COMPLETED as FIRST_COMPLETED,
-)
-from asyncio import (
-    CancelledError,
-    Task,
-    create_task,
-    wait,
-)
-
-# FIXME: integration tests don't use these, but some are used in this repo
-# Use primitives from asyncio within this repo and remove these re-exports
-from asyncio import (
-    Event as Event,
-)
-from asyncio import (
-    Lock as Lock,
-)
-from asyncio import (
-    Queue as Queue,
-)
-from asyncio import (
-    TimeoutError as TimeoutError,
-)
-from asyncio import (
-    all_tasks as all_tasks,
-)
-from asyncio import (
-    as_completed as as_completed,
-)
-from asyncio import (
-    create_subprocess_exec as create_subprocess_exec,
-)
-from asyncio import (
-    current_task as current_task,
-)
-from asyncio import (
-    ensure_future as ensure_future,
-)
-from asyncio import (
-    gather as gather,
-)
-from asyncio import (
-    get_event_loop_policy as get_event_loop_policy,
-)
-from asyncio import (
-    get_running_loop as get_running_loop,
-)
-from asyncio import (
-    new_event_loop as new_event_loop,
-)
-from asyncio import (
-    shield as shield,
-)
-from asyncio import (
-    sleep as sleep,
-)
-from asyncio import (
-    subprocess as subprocess,
-)
-from asyncio import (
-    wait_for as wait_for,
-)
+from asyncio import CancelledError, Task
+from typing import Any, Coroutine
 
 import websockets
-
-warnings.warn(
-    "The jasyncio module is deprecated and will be removed in a future release.",
-    DeprecationWarning,
-    stacklevel=2,
-)
-
 
 ROOT_LOGGER = logging.getLogger()
 
 
-def create_task_with_handler(coro, task_name, logger=ROOT_LOGGER) -> Task:
+def create_task_with_handler(
+    coro: Coroutine[Any, Any, Any], task_name: str, logger: logging.Logger = ROOT_LOGGER
+) -> Task[Any]:
     """Wrapper around "asyncio.create_task" to make sure the task
     exceptions are handled properly.
 
@@ -106,7 +25,9 @@ def create_task_with_handler(coro, task_name, logger=ROOT_LOGGER) -> Task:
     handled/logged whenever the Task is destroyed.
     """
 
-    def _task_result_exp_handler(task, task_name=task_name, logger=logger):
+    def _task_result_exp_handler(
+        task: Task[Any], task_name: str = task_name, logger: logging.Logger = logger
+    ):
         try:
             task.result()
         except CancelledError:
@@ -122,7 +43,7 @@ def create_task_with_handler(coro, task_name, logger=ROOT_LOGGER) -> Task:
             # exception was never retrieved' anyways.
             logger.exception("Task %s raised an exception: %s" % (task_name, e))
 
-    task = create_task(coro)
+    task = asyncio.create_task(coro)
     task.add_done_callback(
         functools.partial(_task_result_exp_handler, task_name=task_name, logger=logger)
     )
@@ -132,7 +53,8 @@ def create_task_with_handler(coro, task_name, logger=ROOT_LOGGER) -> Task:
 class SingletonEventLoop:
     """Single instance containing an event loop to be reused."""
 
-    loop = None
+    loop: asyncio.AbstractEventLoop
+    instance: "SingletonEventLoop"
 
     def __new__(cls):
         if not hasattr(cls, "instance"):
@@ -142,7 +64,7 @@ class SingletonEventLoop:
         return cls.instance
 
 
-def run(*steps):
+def run(*steps: Coroutine[Any, Any, Any]) -> Any:
     """Helper to run one or more async functions synchronously, with graceful
     handling of SIGINT / Ctrl-C.
 
@@ -152,13 +74,16 @@ def run(*steps):
         return
 
     task = None
-    run._sigint = False  # function attr to allow setting from closure
+    _sigint = False
     # Use a singleton class to force a single event loop instance
     loop = SingletonEventLoop().loop
 
     def abort():
+        if task is None:
+            return
         task.cancel()
-        run._sigint = True
+        nonlocal _sigint
+        _sigint = True
 
     added = False
     try:
@@ -171,11 +96,13 @@ def run(*steps):
     try:
         for step in steps:
             task = loop.create_task(step)
-            loop.run_until_complete(wait([task]))
-            if run._sigint:
+            loop.run_until_complete(asyncio.wait([task]))
+            if _sigint:
                 raise KeyboardInterrupt()
             if task.exception():
                 raise task.exception()
+        if task is None:
+            return
         return task.result()
     finally:
         if added:
