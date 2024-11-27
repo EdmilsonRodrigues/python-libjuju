@@ -74,7 +74,7 @@ def run(*steps: Coroutine[Any, Any, Any]) -> Any:
         return
 
     task = None
-    _sigint = False
+    run._sigint = False
     # Use a singleton class to force a single event loop instance
     loop = SingletonEventLoop().loop
 
@@ -82,8 +82,7 @@ def run(*steps: Coroutine[Any, Any, Any]) -> Any:
         if task is None:
             return
         task.cancel()
-        nonlocal _sigint
-        _sigint = True
+        run._sigint = True
 
     added = False
     try:
@@ -97,7 +96,7 @@ def run(*steps: Coroutine[Any, Any, Any]) -> Any:
         for step in steps:
             task = loop.create_task(step)
             loop.run_until_complete(asyncio.wait([task]))
-            if _sigint:
+            if run._sigint:
                 raise KeyboardInterrupt()
             if task.exception():
                 raise task.exception()

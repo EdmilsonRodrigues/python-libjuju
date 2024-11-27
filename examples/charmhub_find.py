@@ -7,7 +7,7 @@ repository for charms.
 
 import logging
 
-from juju import jasyncio
+from juju import _jasyncio
 from juju.model import Model
 
 log = logging.getLogger(__name__)
@@ -33,4 +33,4 @@ async def main():
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
-    jasyncio.run(main())
+    _jasyncio.run(main())

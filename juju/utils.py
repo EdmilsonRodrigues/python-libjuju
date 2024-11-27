@@ -15,7 +15,9 @@ import yaml
 from pyasn1.codec.der.encoder import encode
 from pyasn1.type import char, univ
 
-from . import errors, jasyncio, origin
+from juju import _jasyncio
+
+from . import errors, origin
 from .client import client
 from .errors import JujuError
 
@@ -186,17 +188,17 @@ async def run_with_interrupt(task, *events, log=None):
     :param events: One or more `asyncio.Event`s which, if set, will interrupt
         `task` and cause it to be cancelled.
     """
-    task = jasyncio.create_task_with_handler(task, "tmp", log)
-    event_tasks = [jasyncio.ensure_future(event.wait()) for event in events]
-    done, pending = await jasyncio.wait(
-        [task, *event_tasks], return_when=jasyncio.FIRST_COMPLETED
+    task = _jasyncio.create_task_with_handler(task, "tmp", log)
+    event_tasks = [asyncio.ensure_future(event.wait()) for event in events]
+    done, pending = await asyncio.wait(
+        [task, *event_tasks], return_when=asyncio.FIRST_COMPLETED
     )
     for f in pending:
         f.cancel()  # cancel unfinished tasks
     for f in pending:
         try:
             await f
-        except jasyncio.CancelledError:
+        except asyncio.CancelledError:
             pass
     for f in done:
         f.exception()  # prevent "exception was not retrieved" errors

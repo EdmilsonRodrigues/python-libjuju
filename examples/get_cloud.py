@@ -11,7 +11,7 @@
 
 import logging
 
-from juju import jasyncio
+from juju import _jasyncio
 from juju.controller import Controller
 
 
@@ -29,4 +29,4 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
     ws_logger = logging.getLogger("websockets.protocol")
     ws_logger.setLevel(logging.INFO)
-    jasyncio.run(main())
+    _jasyncio.run(main())

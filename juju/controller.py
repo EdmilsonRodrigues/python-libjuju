@@ -1,6 +1,7 @@
 # Copyright 2023 Canonical Ltd.
 # Licensed under the Apache V2, see LICENCE file for details.
 
+import asyncio
 import json
 import logging
 from concurrent.futures import CancelledError
@@ -8,7 +9,7 @@ from pathlib import Path
 
 import websockets
 
-from . import errors, jasyncio, tag, utils
+from . import errors, tag, utils
 from .client import client, connector
 from .errors import JujuAPIError
 from .offerendpoints import ParseError as OfferParseError
@@ -841,7 +842,7 @@ class Controller:
         all models in the controller. If the user isn't a superuser they
         will get a permission error.
         """
-        stop_event = jasyncio.Event()
+        stop_event = asyncio.Event()
 
         async def _watcher(stop_event):
             try:
@@ -882,7 +883,7 @@ class Controller:
                 raise
 
         log.debug("Starting watcher task for model summaries")
-        jasyncio.ensure_future(_watcher(stop_event))
+        asyncio.ensure_future(_watcher(stop_event))
         return stop_event
 
     async def add_secret_backends(self, id_, name, backend_type, config):
@@ -905,15 +906,17 @@ class Controller:
 
         """
         facade = client.SecretBackendsFacade.from_connection(self.connection())
-        return await facade.AddSecretBackends([
-            {
-                "id": id_,
-                "backend-type": backend_type,
-                "config": config,
-                "name": name,
-                "token-rotate-interval": config.get("token-rotate-interval", None),
-            }
-        ])
+        return await facade.AddSecretBackends(
+            [
+                {
+                    "id": id_,
+                    "backend-type": backend_type,
+                    "config": config,
+                    "name": name,
+                    "token-rotate-interval": config.get("token-rotate-interval", None),
+                }
+            ]
+        )
 
     async def list_secret_backends(self, reveal=False):
         """Return the list of secret backends
@@ -973,15 +976,17 @@ class Controller:
 
         """
         facade = client.SecretBackendsFacade.from_connection(self.connection())
-        return await facade.UpdateSecretBackends([
-            {
-                "name": name,
-                "config": config,
-                "force": force,
-                "token-rotate-interval": token_rotate_interval,
-                "name-change": name_change,
-            }
-        ])
+        return await facade.UpdateSecretBackends(
+            [
+                {
+                    "name": name,
+                    "config": config,
+                    "force": force,
+                    "token-rotate-interval": token_rotate_interval,
+                    "name-change": name_change,
+                }
+            ]
+        )
 
 
 class ConnectedController(Controller):

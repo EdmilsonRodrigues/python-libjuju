@@ -17,7 +17,7 @@ import tempfile
 import time
 from logging import getLogger
 
-from juju import jasyncio
+from juju import _jasyncio
 from juju.controller import Controller
 
 log = getLogger(__name__)
@@ -106,4 +106,4 @@ async def main():
 
 
 if __name__ == "__main__":
-    jasyncio.run(main())
+    _jasyncio.run(main())

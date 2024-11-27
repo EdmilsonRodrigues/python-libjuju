@@ -84,7 +84,7 @@ from asyncio import (
 import websockets
 
 warnings.warn(
-    "The jasyncio module is deprecated and will be removed in a future release.",
+    "juju.jasyncio module is being deprecated by 3.0, use asyncio or juju._jasyncio instead",
     DeprecationWarning,
     stacklevel=2,
 )

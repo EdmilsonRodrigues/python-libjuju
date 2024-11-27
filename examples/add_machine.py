@@ -13,7 +13,7 @@
 
 import logging
 
-from juju import jasyncio
+from juju import _jasyncio
 from juju.model import Model
 
 MB = 1
@@ -69,4 +69,4 @@ if __name__ == "__main__":
     ws_logger = logging.getLogger("websockets.protocol")
     ws_logger.setLevel(logging.INFO)
 
-    jasyncio.run(main())
+    _jasyncio.run(main())
