@@ -3,7 +3,7 @@
 
 """This example demonstrate how debug-log works"""
 
-from juju import jasyncio
+from juju import _jasyncio
 from juju.model import Model
 
 
@@ -34,4 +34,4 @@ async def main():
 
 
 if __name__ == "__main__":
-    jasyncio.run(main())
+    _jasyncio.run(main())

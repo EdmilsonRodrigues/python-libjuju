@@ -12,7 +12,7 @@
 
 import logging
 
-from juju import jasyncio
+from juju import _jasyncio
 from juju.client import client
 from juju.model import Model
 
@@ -34,4 +34,4 @@ if __name__ == "__main__":
     ws_logger.setLevel(logging.INFO)
     # Run loop until the process is manually stopped (watch will loop
     # forever).
-    jasyncio.run(watch())
+    _jasyncio.run(watch())

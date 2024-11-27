@@ -9,11 +9,11 @@
 
 """
 
-from juju import jasyncio
+from juju import _jasyncio
 from juju.model import Model
 
 
-async def on_model_change(delta, old, new, model):  # noqa: RUF029
+async def on_model_change(delta, old, new, model):
     print(delta.entity, delta.type, delta.data)
     print(old)
     print(new)
@@ -31,4 +31,4 @@ async def watch_model():
 if __name__ == "__main__":
     # Run loop until the process is manually stopped (watch_model will loop
     # forever).
-    jasyncio.run(watch_model())
+    _jasyncio.run(watch_model())

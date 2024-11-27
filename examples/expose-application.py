@@ -11,7 +11,7 @@
 NOTE: this test must be run against a 2.9 controller.
 """
 
-from juju import jasyncio
+from juju import _jasyncio
 from juju.application import ExposedEndpoint
 from juju.model import Model
 
@@ -81,4 +81,4 @@ async def main():
 
 
 if __name__ == "__main__":
-    jasyncio.run(main())
+    _jasyncio.run(main())

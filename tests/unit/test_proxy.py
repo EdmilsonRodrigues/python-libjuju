@@ -24,9 +24,11 @@ class TestJujuDataFactory(unittest.TestCase):
     def test_proxy_from_config_missing_type(self):
         """Test that a nil proxy type returns None."""
         self.assertIsNone(
-            proxy_from_config({
-                "config": {},
-            })
+            proxy_from_config(
+                {
+                    "config": {},
+                }
+            )
         )
 
     def test_proxy_from_config_non_arg(self):
@@ -37,16 +39,18 @@ class TestJujuDataFactory(unittest.TestCase):
 
     def test_proxy_from_config_kubernetes(self):
         """Tests that a Kubernetes proxy is correctly created from config."""
-        proxy = proxy_from_config({
-            "type": "kubernetes-port-forward",
-            "config": {
-                "api-host": "https://localhost:8456",
-                "namespace": "controller-python-test",
-                "remote-port": "1234",
-                "service": "controller",
-                "service-account-token": "==AA",
-                "ca-cert": "==AA",
-            },
-        })
+        proxy = proxy_from_config(
+            {
+                "type": "kubernetes-port-forward",
+                "config": {
+                    "api-host": "https://localhost:8456",
+                    "namespace": "controller-python-test",
+                    "remote-port": "1234",
+                    "service": "controller",
+                    "service-account-token": "==AA",
+                    "ca-cert": "==AA",
+                },
+            }
+        )
 
         self.assertIs(type(proxy), KubernetesProxy)

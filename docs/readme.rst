@@ -49,7 +49,7 @@ Note : Pylibjuju requires an already bootstrapped Juju controller to connect to.
   import logging
   import sys
 
-  from juju import jasyncio
+  from juju import _jasyncio
   from juju.model import Model
 
 
@@ -87,7 +87,7 @@ Note : Pylibjuju requires an already bootstrapped Juju controller to connect to.
 
       # Run the deploy coroutine in an asyncio event loop, using a helper
       # that abstracts loop creation and teardown.
-      jasyncio.run(deploy())
+      _jasyncio.run(deploy())
 
 
   if __name__ == '__main__':
