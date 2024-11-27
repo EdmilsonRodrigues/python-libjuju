@@ -10,7 +10,6 @@ import uuid
 from unittest import mock
 
 import paramiko
-import pylxd
 import pytest
 
 from juju import tag, url
@@ -29,6 +28,11 @@ from .. import base
 from ..utils import GB, INTEGRATION_TEST_DIR, MB, OVERLAYS_DIR, SSH_KEY, TESTS_DIR
 
 
+@pytest.fixture
+def pylxd():
+    return pytest.importorskip("pylxd")
+
+
 @base.bootstrapped
 async def test_model_name():
     model = Model()
@@ -39,6 +43,42 @@ async def test_model_name():
         await model.connect(new_model.name)
         assert model.name == new_model.name
         await model.disconnect()
+
+
+@base.bootstrapped
+async def test_deploy_with_storage_unparsed():
+    async with base.CleanModel() as model:
+        await model.deploy(
+            "postgresql",
+            storage={"pgdata": "1G"},
+        )
+        await model.wait_for_idle(status="active")
+        storages = await model.list_storage()
+        assert len(storages) == 1
+        [storage] = storages
+        # size information isn't exposed, so can't assert on that
+        assert storage["owner-tag"].startswith(tag.unit("postgresql"))
+        assert storage["storage-tag"].startswith(tag.storage("pgdata"))
+        assert storage["life"] == "alive"
+        assert storage["status"].status == "attached"
+
+
+@base.bootstrapped
+async def test_deploy_with_storage_preparsed():
+    async with base.CleanModel() as model:
+        await model.deploy(
+            "postgresql",
+            storage={"pgdata": {"size": 1024, "count": 1}},
+        )
+        await model.wait_for_idle(status="active")
+        storages = await model.list_storage()
+        assert len(storages) == 1
+        [storage] = storages
+        # size information isn't exposed, so can't assert on that
+        assert storage["owner-tag"].startswith(tag.unit("postgresql"))
+        assert storage["storage-tag"].startswith(tag.storage("pgdata"))
+        assert storage["life"] == "alive"
+        assert storage["status"].status == "attached"
 
 
 @base.bootstrapped
@@ -532,7 +572,7 @@ async def test_add_machine():
         assert len(model.machines) == 0
 
 
-async def add_manual_machine_ssh(is_root=False):
+async def add_manual_machine_ssh(pylxd, is_root=False):
     # Verify controller is localhost
     async with base.CleanController() as controller:
         cloud = await controller.get_cloud()
@@ -677,7 +717,7 @@ async def add_manual_machine_ssh(is_root=False):
 
 
 @base.bootstrapped
-async def test_add_manual_machine_ssh():
+async def test_add_manual_machine_ssh(pylxd):
     """Test manual machine provisioning with a non-root user.
 
     Tests manual machine provisioning using a randomized username with
@@ -687,9 +727,9 @@ async def test_add_manual_machine_ssh():
 
 
 @base.bootstrapped
-async def test_add_manual_machine_ssh_root():
+async def test_add_manual_machine_ssh_root(pylxd):
     """Test manual machine provisioning with the root user."""
-    await add_manual_machine_ssh(is_root=True)
+    await add_manual_machine_ssh(pylxd, is_root=True)
 
 
 @base.bootstrapped
