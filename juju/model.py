@@ -1902,7 +1902,7 @@ class Model:
                 # new apps will usually be in the model by now, but if some
                 # haven't made it yet we'll need to wait on them to be added
                 await asyncio.gather(*[
-                    asyncio.ensure_future(self._wait_for_new("application", app_name))
+                    self._wait_for_new("application", app_name)
                     for app_name in pending_apps
                 ])
             return [
