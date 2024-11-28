@@ -884,14 +884,12 @@ class Connection:
             ]
 
         try:
-            return await self.rpc(
-                {
-                    "type": "Admin",
-                    "request": "Login",
-                    "version": 3,
-                    "params": params,
-                }
-            )
+            return await self.rpc({
+                "type": "Admin",
+                "request": "Login",
+                "version": 3,
+                "params": params,
+            })
         except errors.JujuAPIError as e:
             if e.error_code != "redirection required":
                 raise
@@ -909,13 +907,11 @@ class Connection:
             # we can safely close the connection after login
             # fails.
             redirect_info = (
-                await self.rpc(
-                    {
-                        "type": "Admin",
-                        "request": "RedirectInfo",
-                        "version": 3,
-                    }
-                )
+                await self.rpc({
+                    "type": "Admin",
+                    "request": "RedirectInfo",
+                    "version": 3,
+                })
             )["response"]
             raise errors.JujuRedirectException(redirect_info, True) from e
 

@@ -208,12 +208,10 @@ class Application(model.ModelEntity):
             attach_storage=attach_storage,
         )
 
-        return await asyncio.gather(
-            *[
-                asyncio.ensure_future(self.model._wait_for_new("unit", unit_id))
-                for unit_id in result.units
-            ]
-        )
+        return await asyncio.gather(*[
+            asyncio.ensure_future(self.model._wait_for_new("unit", unit_id))
+            for unit_id in result.units
+        ])
 
     add_units = add_unit
 

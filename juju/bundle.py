@@ -157,9 +157,9 @@ class BundleHandler:
         if apps:
             # If we have apps to update, spawn all the coroutines concurrently
             # and wait for them to finish.
-            charm_urls = await asyncio.gather(
-                *[self.model.add_local_charm_dir(*params) for params in args]
-            )
+            charm_urls = await asyncio.gather(*[
+                self.model.add_local_charm_dir(*params) for params in args
+            ])
 
             # Update the 'charm:' entry for each app with the new 'local:' url.
             for app_name, charm_url, (charm_dir, series) in zip(apps, charm_urls, args):

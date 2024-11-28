@@ -34,13 +34,11 @@ class WebsocketMock:
 
 
 async def test_out_of_order():
-    ws = WebsocketMock(
-        [
-            {"request-id": 1},
-            {"request-id": 3},
-            {"request-id": 2},
-        ]
-    )
+    ws = WebsocketMock([
+        {"request-id": 1},
+        {"request-id": 3},
+        {"request-id": 2},
+    ])
     expected_responses = [
         {"request-id": 1},
         {"request-id": 2},
@@ -79,35 +77,33 @@ async def test_bubble_redirect_exception():
 -----BEGIN CERTIFICATE-----
 SOMECERT
 -----END CERTIFICATE-----"""
-    ws = WebsocketMock(
-        [
-            {
-                "request-id": 1,
-                "error": "redirection to alternative server required",
-                "error-code": "redirection required",
-                "error-info": {
-                    "ca-cert": ca_cert,
-                    "servers": [
-                        [
-                            {
-                                "port": 17070,
-                                "scope": "local-cloud",
-                                "type": "ipv4",
-                                "value": "42.42.42.42",
-                            },
-                            {
-                                "port": 4242,
-                                "scope": "public",
-                                "type": "ipv4",
-                                "value": "42.42.42.42",
-                            },
-                        ]
-                    ],
-                },
-                "response": {},
+    ws = WebsocketMock([
+        {
+            "request-id": 1,
+            "error": "redirection to alternative server required",
+            "error-code": "redirection required",
+            "error-info": {
+                "ca-cert": ca_cert,
+                "servers": [
+                    [
+                        {
+                            "port": 17070,
+                            "scope": "local-cloud",
+                            "type": "ipv4",
+                            "value": "42.42.42.42",
+                        },
+                        {
+                            "port": 4242,
+                            "scope": "public",
+                            "type": "ipv4",
+                            "value": "42.42.42.42",
+                        },
+                    ]
+                ],
             },
-        ]
-    )
+            "response": {},
+        },
+    ])
     with pytest.raises(JujuRedirectException) as caught_ex:
         with mock.patch("websockets.connect", mock.AsyncMock(return_value=ws)):
             await Connection.connect("0.1.2.3:999")
@@ -126,52 +122,48 @@ async def test_follow_redirect():
 -----BEGIN CERTIFICATE-----
 SOMECERT
 -----END CERTIFICATE-----"""
-    cont1 = WebsocketMock(
-        [
-            {
-                "request-id": 1,
-                "error": "redirection to alternative server required",
-                "error-code": "redirection required",
-                "response": {},
+    cont1 = WebsocketMock([
+        {
+            "request-id": 1,
+            "error": "redirection to alternative server required",
+            "error-code": "redirection required",
+            "response": {},
+        },
+        {
+            "request-id": 2,
+            "response": {
+                "ca-cert": ca_cert,
+                "servers": [
+                    [
+                        {
+                            "port": 17070,
+                            "scope": "local-cloud",
+                            "type": "ipv4",
+                            "value": "42.42.42.42",
+                        },
+                        {
+                            "port": 4242,
+                            "scope": "public",
+                            "type": "ipv4",
+                            "value": "42.42.42.42",
+                        },
+                    ]
+                ],
             },
-            {
-                "request-id": 2,
-                "response": {
-                    "ca-cert": ca_cert,
-                    "servers": [
-                        [
-                            {
-                                "port": 17070,
-                                "scope": "local-cloud",
-                                "type": "ipv4",
-                                "value": "42.42.42.42",
-                            },
-                            {
-                                "port": 4242,
-                                "scope": "public",
-                                "type": "ipv4",
-                                "value": "42.42.42.42",
-                            },
-                        ]
-                    ],
-                },
-            },
-        ]
-    )
+        },
+    ])
     minimal_facades = [{"name": "Pinger", "versions": [1]}]
-    cont2 = WebsocketMock(
-        [
-            {"request-id": 1},
-            {"request-id": 2},
-            {
-                "request-id": 3,
-                "response": {
-                    "result": minimal_facades,
-                    "server-version": "3.0",
-                },
+    cont2 = WebsocketMock([
+        {"request-id": 1},
+        {"request-id": 2},
+        {
+            "request-id": 3,
+            "response": {
+                "result": minimal_facades,
+                "server-version": "3.0",
             },
-        ]
-    )
+        },
+    ])
 
     con = None
     try:
@@ -188,11 +180,9 @@ SOMECERT
 
 
 async def test_rpc_none_results():
-    ws = WebsocketMock(
-        [
-            {"request-id": 1, "response": {"results": None}},
-        ]
-    )
+    ws = WebsocketMock([
+        {"request-id": 1, "response": {"results": None}},
+    ])
     expected_responses = [
         {"request-id": 1, "response": {"results": None}},
     ]

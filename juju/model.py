@@ -1901,14 +1901,10 @@ class Model:
             if pending_apps:
                 # new apps will usually be in the model by now, but if some
                 # haven't made it yet we'll need to wait on them to be added
-                await asyncio.gather(
-                    *[
-                        asyncio.ensure_future(
-                            self._wait_for_new("application", app_name)
-                        )
-                        for app_name in pending_apps
-                    ]
-                )
+                await asyncio.gather(*[
+                    asyncio.ensure_future(self._wait_for_new("application", app_name))
+                    for app_name in pending_apps
+                ])
             return [
                 app
                 for name, app in self.applications.items()
@@ -2395,15 +2391,13 @@ class Model:
             if unit_tag is None:
                 log.error("Error converting %s to a valid unit tag", unit_id)
                 raise JujuUnitError("Error converting %s to a valid unit tag", unit_id)
-            units_to_destroy.append(
-                {
-                    "unit-tag": unit_tag,
-                    "destroy-storage": destroy_storage,
-                    "force": force,
-                    "max-wait": max_wait,
-                    "dry-run": dry_run,
-                }
-            )
+            units_to_destroy.append({
+                "unit-tag": unit_tag,
+                "destroy-storage": destroy_storage,
+                "force": force,
+                "max-wait": max_wait,
+                "dry-run": dry_run,
+            })
         log.debug("Destroying units %s", unit_names)
         return await app_facade.DestroyUnit(units=units_to_destroy)
 
@@ -2870,15 +2864,13 @@ class Model:
             raise JujuNotSupportedError("user secrets")
 
         secrets_facade = client.SecretsFacade.from_connection(self.connection())
-        results = await secrets_facade.CreateSecrets(
-            [
-                {
-                    "content": {"data": data},
-                    "description": info,
-                    "label": name,
-                }
-            ]
-        )
+        results = await secrets_facade.CreateSecrets([
+            {
+                "content": {"data": data},
+                "description": info,
+                "label": name,
+            }
+        ])
         if len(results.results) != 1:
             raise JujuAPIError(f"expected 1 result, got {len(results.results)}")
         result = results.results[0]
@@ -2907,16 +2899,14 @@ class Model:
         if client.SecretsFacade.best_facade_version(self.connection()) < 2:
             raise JujuNotSupportedError("user secrets")
         secrets_facade = client.SecretsFacade.from_connection(self.connection())
-        results = await secrets_facade.UpdateSecrets(
-            [
-                {
-                    "content": {"data": data},
-                    "description": info,
-                    "existing-label": name,
-                    "label": new_name,
-                }
-            ]
-        )
+        results = await secrets_facade.UpdateSecrets([
+            {
+                "content": {"data": data},
+                "description": info,
+                "existing-label": name,
+                "label": new_name,
+            }
+        ])
         if len(results.results) != 1:
             raise JujuAPIError(f"expected 1 result, got {len(results.results)}")
         result_error = results.results[0]

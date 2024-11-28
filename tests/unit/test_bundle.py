@@ -827,12 +827,10 @@ class TestExposeChangeRun:
         assert result is None
 
         model.applications["application1"].expose.assert_called_once()
-        model.applications["application1"].expose.assert_called_with(
-            {
-                "": {"to-spaces": ["alpha"], "to-cidrs": ["10.0.0.0/24"]},
-                "foo": {"to-spaces": ["alien"], "to-cidrs": ["0.0.0.0/0", "::/0"]},
-            }
-        )
+        model.applications["application1"].expose.assert_called_with({
+            "": {"to-spaces": ["alpha"], "to-cidrs": ["10.0.0.0/24"]},
+            "foo": {"to-spaces": ["alien"], "to-cidrs": ["0.0.0.0/0", "::/0"]},
+        })
 
 
 class TestScaleChange(unittest.TestCase):
