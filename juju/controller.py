@@ -906,17 +906,15 @@ class Controller:
 
         """
         facade = client.SecretBackendsFacade.from_connection(self.connection())
-        return await facade.AddSecretBackends(
-            [
-                {
-                    "id": id_,
-                    "backend-type": backend_type,
-                    "config": config,
-                    "name": name,
-                    "token-rotate-interval": config.get("token-rotate-interval", None),
-                }
-            ]
-        )
+        return await facade.AddSecretBackends([
+            {
+                "id": id_,
+                "backend-type": backend_type,
+                "config": config,
+                "name": name,
+                "token-rotate-interval": config.get("token-rotate-interval", None),
+            }
+        ])
 
     async def list_secret_backends(self, reveal=False):
         """Return the list of secret backends
@@ -976,17 +974,15 @@ class Controller:
 
         """
         facade = client.SecretBackendsFacade.from_connection(self.connection())
-        return await facade.UpdateSecretBackends(
-            [
-                {
-                    "name": name,
-                    "config": config,
-                    "force": force,
-                    "token-rotate-interval": token_rotate_interval,
-                    "name-change": name_change,
-                }
-            ]
-        )
+        return await facade.UpdateSecretBackends([
+            {
+                "name": name,
+                "config": config,
+                "force": force,
+                "token-rotate-interval": token_rotate_interval,
+                "name-change": name_change,
+            }
+        ])
 
 
 class ConnectedController(Controller):

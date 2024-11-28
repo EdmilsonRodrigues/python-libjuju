@@ -1092,12 +1092,10 @@ async def test_config():
         # first test get_config with nothing.
         result = await model.get_config()
         assert "extra-info" not in result
-        await model.set_config(
-            {
-                "extra-info": "booyah",
-                "test-mode": client.ConfigValue(value=True),
-            }
-        )
+        await model.set_config({
+            "extra-info": "booyah",
+            "test-mode": client.ConfigValue(value=True),
+        })
         result = await model.get_config()
         assert "extra-info" in result
         assert result["extra-info"].source == "model"
@@ -1112,12 +1110,10 @@ async def test_config_with_json():
         assert "extra-complex-info" not in result
         # test model config with more complex data
         expected = ["foo", {"bar": 1}]
-        await model.set_config(
-            {
-                "extra-complex-info": json.dumps(expected),
-                "test-mode": client.ConfigValue(value=True),
-            }
-        )
+        await model.set_config({
+            "extra-complex-info": json.dumps(expected),
+            "test-mode": client.ConfigValue(value=True),
+        })
         result = await model.get_config()
         assert "extra-complex-info" in result
         assert result["extra-complex-info"].source == "model"
