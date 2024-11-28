@@ -9,7 +9,8 @@
 
 """
 
-from juju import _jasyncio
+import asyncio
+
 from juju.model import Model
 
 
@@ -31,4 +32,4 @@ async def watch_model():
 if __name__ == "__main__":
     # Run loop until the process is manually stopped (watch_model will loop
     # forever).
-    _jasyncio.run(watch_model())
+    asyncio.run(watch_model())

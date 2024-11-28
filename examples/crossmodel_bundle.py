@@ -13,11 +13,11 @@
 
 """
 
+import asyncio
 import time
 from logging import getLogger
 from pathlib import Path
 
-from juju import _jasyncio
 from juju.controller import Controller
 
 log = getLogger(__name__)
@@ -87,4 +87,4 @@ async def main():
 
 
 if __name__ == "__main__":
-    _jasyncio.run(main())
+    asyncio.run(main())
