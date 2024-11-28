@@ -209,7 +209,7 @@ class Application(model.ModelEntity):
         )
 
         return await asyncio.gather(*[
-            asyncio.ensure_future(self.model._wait_for_new("unit", unit_id))
+            self.model._wait_for_new("unit", unit_id)
             for unit_id in result.units
         ])
 
