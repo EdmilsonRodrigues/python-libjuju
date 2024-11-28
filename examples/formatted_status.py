@@ -12,7 +12,6 @@ import sys
 import tempfile
 from logging import getLogger
 
-from juju import _jasyncio
 from juju.model import Model
 from juju.status import formatted_status
 
@@ -47,4 +46,4 @@ async def main():
 
 
 if __name__ == "__main__":
-    _jasyncio.run(main())
+    asyncio.run(main())

@@ -10,9 +10,9 @@
 
 """
 
+import asyncio
 import logging
 
-from juju import _jasyncio
 from juju.model import Model
 
 
@@ -66,4 +66,4 @@ if __name__ == "__main__":
     DEBUG:root:Action status: completed
     DEBUG:root:Action results: {'return-code': 0, 'stdout': '10.42.51.101\n'}
     """
-    _jasyncio.run(main())
+    asyncio.run(main())

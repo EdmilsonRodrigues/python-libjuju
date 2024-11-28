@@ -4,8 +4,6 @@
 import asyncio
 import unittest
 
-from juju import _jasyncio
-
 
 class TestLoop(unittest.TestCase):
     def setUp(self):
@@ -23,16 +21,10 @@ class TestLoop(unittest.TestCase):
         async def _test():
             return "success"
 
-        self.assertEqual(_jasyncio.run(_test()), "success")
-
-    async def test_run_interrupt(self):
-        async def _test():
-            _jasyncio.run._sigint = True
-
-        self.assertRaises(KeyboardInterrupt, _jasyncio.run, _test())
+        self.assertEqual(asyncio.run(_test()), "success")
 
     async def test_run_exception(self):
         async def _test():
             raise ValueError()
 
-        self.assertRaises(ValueError, _jasyncio.run, _test())
+        self.assertRaises(ValueError, asyncio.run, _test())
