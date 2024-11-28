@@ -1,7 +1,6 @@
 import asyncio
 import functools
 import logging
-import signal
 from asyncio import CancelledError, Task
 from typing import Any, Coroutine
 
