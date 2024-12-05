@@ -451,26 +451,36 @@ class Connection:
                     self.debug_log_shown_lines += number_of_lines_written
 
                     if self.debug_log_shown_lines >= self.debug_log_params["limit"]:
-                        asyncio.create_task(self.close(), name="Task_Close")
+                        asyncio.create_task(
+                            self.close(), name="Task_Close"
+                        ).add_done_callback(lambda f: f.result())
                         return
 
         except KeyError as e:
             log.exception("Unexpected debug line -- %s" % e)
-            asyncio.create_task(self.close(), name="Task_Close")
+            asyncio.create_task(self.close(), name="Task_Close").add_done_callback(
+                lambda f: f.result()
+            )
             raise
         except asyncio.CancelledError:
-            asyncio.create_task(self.close(), name="Task_Close")
+            asyncio.create_task(self.close(), name="Task_Close").add_done_callback(
+                lambda f: f.result()
+            )
             raise
         except websockets.exceptions.ConnectionClosed:
             log.warning("Debug Logger: Connection closed, reconnecting")
             # the reconnect has to be done as a task because the receiver will
             # be cancelled by the reconnect and we don't want the reconnect
             # to be aborted half-way through
-            asyncio.ensure_future(self.reconnect())
+            asyncio.ensure_future(self.reconnect()).add_done_callback(
+                lambda f: f.result()
+            )
             return
         except Exception as e:
             log.exception("Error in debug logger : %s" % e)
-            asyncio.create_task(self.close(), name="Task_Close")
+            asyncio.create_task(self.close(), name="Task_Close").add_done_callback(
+                lambda f: f.result()
+            )
             raise
 
     async def _receiver(self):
@@ -493,7 +503,9 @@ class Connection:
             # the reconnect has to be done as a task because the receiver will
             # be cancelled by the reconnect and we don't want the reconnect
             # to be aborted half-way through
-            asyncio.ensure_future(self.reconnect())
+            asyncio.ensure_future(self.reconnect()).add_done_callback(
+                lambda f: f.result()
+            )
             return
         except Exception as e:
             log.exception("Error in receiver")

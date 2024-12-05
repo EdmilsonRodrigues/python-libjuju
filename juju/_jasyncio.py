@@ -1,3 +1,8 @@
+# Copyright 2023 Canonical Ltd.
+# Licensed under the Apache V2, see LICENCE file for details.
+
+from __future__ import annotations
+
 import asyncio
 import functools
 import logging
@@ -53,7 +58,7 @@ class SingletonEventLoop:
     """Single instance containing an event loop to be reused."""
 
     loop: asyncio.AbstractEventLoop
-    instance: "SingletonEventLoop"
+    instance: SingletonEventLoop
 
     def __new__(cls):
         if not hasattr(cls, "instance"):

@@ -209,8 +209,7 @@ class Application(model.ModelEntity):
         )
 
         return await asyncio.gather(*[
-            self.model._wait_for_new("unit", unit_id)
-            for unit_id in result.units
+            self.model._wait_for_new("unit", unit_id) for unit_id in result.units
         ])
 
     add_units = add_unit

@@ -883,7 +883,9 @@ class Controller:
                 raise
 
         log.debug("Starting watcher task for model summaries")
-        asyncio.ensure_future(_watcher(stop_event))
+        asyncio.ensure_future(_watcher(stop_event)).add_done_callback(
+            lambda f: f.result()
+        )
         return stop_event
 
     async def add_secret_backends(self, id_, name, backend_type, config):

@@ -162,11 +162,6 @@ async def test_run_action():
 
 @base.bootstrapped
 async def test_scp():
-    # ensure that asyncio.subprocess will work;
-    try:
-        asyncio.get_child_watcher().attach_loop(asyncio.get_running_loop())
-    except RuntimeError:
-        pytest.skip("test_scp will always fail outside of MainThread")
     async with base.CleanModel() as model:
         app = await model.deploy("ubuntu", channel="stable")
 

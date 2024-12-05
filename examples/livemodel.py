@@ -19,6 +19,7 @@ async def on_model_change(delta, old, new, model):
     print(old)
     print(new)
     print(model)
+    await asyncio.sleep(0)
 
 
 async def watch_model():
