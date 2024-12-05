@@ -1398,8 +1398,7 @@ class Model:
 
         for o in self._observers:
             if o.cares_about(delta):
-                f = asyncio.ensure_future(o(delta, old_obj, new_obj, self))
-                f.add_done_callback(lambda f: f.result())
+                asyncio.ensure_future(o(delta, old_obj, new_obj, self))  # noqa: RUF006
 
     async def _wait(self, entity_type, entity_id, action, predicate=None):
         """Block the calling routine until a given action has happened to the
