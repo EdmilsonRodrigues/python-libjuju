@@ -109,7 +109,10 @@ def py_to_go_cookie(py_cookie):
 
 
 def generate_rfc3339_from_unix_time(unix_time: datetime.datetime) -> str:
-    rfc, discard = unix_time.isoformat().split(".")
+    splitted_rfc = unix_time.isoformat().split(".")
+    if len(splitted_rfc) == 1:
+        return f"{splitted_rfc[0]}Z"
+    rfc, discard = splitted_rfc
     discard = discard.split("+")
     if len(discard) > 1:
         rfc = datetime.datetime.fromisoformat(rfc)
