@@ -3,7 +3,7 @@
 
 import logging
 
-import pyrfc3339
+import ciso8601
 
 from juju.errors import JujuAPIError, JujuError
 
@@ -25,7 +25,7 @@ class Unit(model.ModelEntity):
     @property
     def agent_status_since(self):
         """Get the time when the `agent_status` was last updated."""
-        return pyrfc3339.parse(self.safe_data["agent-status"]["since"])
+        return ciso8601.parse_rfc3339(self.safe_data["agent-status"]["since"])
 
     @property
     def is_subordinate(self):
@@ -52,7 +52,7 @@ class Unit(model.ModelEntity):
     @property
     def workload_status_since(self):
         """Get the time when the `workload_status` was last updated."""
-        return pyrfc3339.parse(self.safe_data["workload-status"]["since"])
+        return ciso8601.parse_rfc3339(self.safe_data["workload-status"]["since"])
 
     @property
     def workload_status_message(self):

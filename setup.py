@@ -21,7 +21,7 @@ setup(
     package_data={"juju": ["py.typed"]},
     install_requires=[
         "macaroonbakery>=1.1,<2.0",
-        "pyRFC3339>=1.0,<2.0",
+        "ciso8601>=2.3.2",
         "pyyaml>=5.1.2",
         "websockets>=13.0.1",
         "paramiko>=2.4.0",

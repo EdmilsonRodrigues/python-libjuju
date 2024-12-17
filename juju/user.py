@@ -3,7 +3,7 @@
 
 import logging
 
-import pyrfc3339
+import ciso8601
 
 from . import errors, tag
 from .client import client
@@ -31,7 +31,7 @@ class User:
 
     @property
     def last_connection(self):
-        return pyrfc3339.parse(self._user_info.last_connection)
+        return ciso8601.parse_rfc3339(self._user_info.last_connection)
 
     @property
     def access(self):

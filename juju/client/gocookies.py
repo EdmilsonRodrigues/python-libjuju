@@ -6,7 +6,7 @@ import http.cookiejar as cookiejar
 import json
 import time
 
-import pyrfc3339
+import ciso8601
 
 
 class GoCookieJar(cookiejar.FileCookieJar):
@@ -52,7 +52,7 @@ def go_to_py_cookie(go_cookie):
     """Convert a Go-style JSON-unmarshaled cookie into a Python cookie"""
     expires = None
     if go_cookie.get("Expires") is not None:
-        t = pyrfc3339.parse(go_cookie["Expires"])
+        t = ciso8601.parse_rfc3339(go_cookie["Expires"])
         expires = t.timestamp()
     return cookiejar.Cookie(
         version=0,
@@ -104,5 +104,23 @@ def py_to_go_cookie(py_cookie):
         unix_time = datetime.datetime.fromtimestamp(py_cookie.expires)
         # Note: fromtimestamp bizarrely produces a time without
         # a time zone, so we need to use accept_naive.
-        go_cookie["Expires"] = pyrfc3339.generate(unix_time, accept_naive=True)
+        go_cookie["Expires"] = generate_rfc3339_from_unix_time(unix_time)
     return go_cookie
+
+
+def generate_rfc3339_from_unix_time(unix_time: datetime.datetime) -> str:
+    rfc, discard = unix_time.isoformat().split(".")
+    discard = discard.split("+")
+    if len(discard) > 1:
+        rfc = datetime.datetime.fromisoformat(rfc)
+        hours, minutes = discard[1].split(":")
+        rfc -= datetime.timedelta(hours=int(hours), minutes=int(minutes))
+        rfc = rfc.isoformat()
+    else:
+        discard = discard[0].split("-")
+        if len(discard) > 1:
+            rfc = datetime.datetime.fromisoformat(rfc)
+            hours, minutes = discard[1].split(":")
+            rfc += datetime.timedelta(hours=int(hours), minutes=int(minutes))
+            rfc = rfc.isoformat()
+    return f"{rfc}Z"
