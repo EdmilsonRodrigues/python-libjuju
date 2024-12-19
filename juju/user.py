@@ -1,9 +1,8 @@
 # Copyright 2023 Canonical Ltd.
 # Licensed under the Apache V2, see LICENCE file for details.
 
+import datetime
 import logging
-
-import pyrfc3339
 
 from . import errors, tag
 from .client import client
@@ -31,7 +30,7 @@ class User:
 
     @property
     def last_connection(self):
-        return pyrfc3339.parse(self._user_info.last_connection)
+        return datetime.datetime.fromisoformat(self._user_info.last_connection)
 
     @property
     def access(self):

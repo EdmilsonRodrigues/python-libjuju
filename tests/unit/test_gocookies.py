@@ -2,19 +2,19 @@
 # Licensed under the Apache V2, see LICENCE file for details.
 """Tests for the gocookies code."""
 
+import datetime
 import os
 import shutil
 import tempfile
 import unittest
 import urllib.request
 
-import pyrfc3339
-
 from juju.client.gocookies import GoCookieJar
 
 # cookie_content holds the JSON contents of a Go-produced
 # cookie file (reformatted so it's not all on one line but
 # otherwise unchanged).
+
 cookie_content = """
 [
     {
@@ -223,7 +223,9 @@ class TestGoCookieJar(unittest.TestCase):
         ]"""
         jar = self.load_jar(content)
         got_expires = tuple(jar)[0].expires
-        want_expires = int(pyrfc3339.parse("2345-11-15T18:16:08Z").timestamp())
+        want_expires = int(
+            datetime.datetime.fromisoformat("2345-11-15T18:16:08Z").timestamp()
+        )
         self.assertEqual(got_expires, want_expires)
 
     def load_jar(self, content):

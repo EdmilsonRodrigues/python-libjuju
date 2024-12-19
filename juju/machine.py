@@ -1,11 +1,10 @@
 # Copyright 2023 Canonical Ltd.
 # Licensed under the Apache V2, see LICENCE file for details.
 
+import datetime
 import ipaddress
 import logging
 import typing
-
-import pyrfc3339
 
 from juju.utils import block_until, juju_ssh_key_paths
 
@@ -238,7 +237,7 @@ class Machine(model.ModelEntity):
     @property
     def agent_status_since(self):
         """Get the time when the `agent_status` was last updated."""
-        return pyrfc3339.parse(self.safe_data["agent-status"]["since"])
+        return datetime.datetime.fromisoformat(self.safe_data["agent-status"]["since"])
 
     @property
     def agent_version(self):
@@ -265,7 +264,9 @@ class Machine(model.ModelEntity):
     @property
     def status_since(self):
         """Get the time when the `status` was last updated."""
-        return pyrfc3339.parse(self.safe_data["instance-status"]["since"])
+        return datetime.datetime.fromisoformat(
+            self.safe_data["instance-status"]["since"]
+        )
 
     @property
     def dns_name(self):
