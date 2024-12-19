@@ -2,13 +2,14 @@
 # Licensed under the Apache V2, see LICENCE file for details.
 
 import datetime
+import asyncio
 import ipaddress
 import logging
 import typing
 
 from juju.utils import block_until, juju_ssh_key_paths
 
-from . import jasyncio, model, tag
+from . import model, tag
 from .annotationhelper import _get_annotations, _set_annotations
 from .client import client
 from .errors import JujuError
@@ -157,11 +158,11 @@ class Machine(model.ModelEntity):
         retry_backoff = 2
         retries = 10
         for _ in range(retries):
-            process = await jasyncio.create_subprocess_exec(*cmd)
+            process = await asyncio.create_subprocess_exec(*cmd)
             await process.wait()
             if process.returncode == 0:
                 break
-            await jasyncio.sleep(retry_backoff)
+            await asyncio.sleep(retry_backoff)
         if process.returncode != 0:
             raise JujuError(f"command failed after {retries} attempts: {cmd}")
 
@@ -210,13 +211,13 @@ class Machine(model.ModelEntity):
         retry_backoff = 2
         retries = 10
         for _ in range(retries):
-            process = await jasyncio.create_subprocess_exec(
-                *cmd, stdout=jasyncio.subprocess.PIPE, stderr=jasyncio.subprocess.PIPE
+            process = await asyncio.create_subprocess_exec(
+                *cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
             )
             stdout, stderr = await process.communicate()
             if process.returncode == 0:
                 break
-            await jasyncio.sleep(retry_backoff)
+            await asyncio.sleep(retry_backoff)
         if process.returncode != 0:
             raise JujuError(
                 f"command failed: {cmd} after {retries} attempts, with {stderr.decode()}"
