@@ -2,6 +2,9 @@
 # Licensed under the Apache V2, see LICENCE file for details.
 """Python Library for Juju."""
 
-from backports.datetime_fromisoformat import MonkeyPatch
+try:
+    from backports.datetime_fromisoformat import MonkeyPatch
 
-MonkeyPatch.patch_fromisoformat()
+    MonkeyPatch.patch_fromisoformat()
+except ImportError:
+    pass
